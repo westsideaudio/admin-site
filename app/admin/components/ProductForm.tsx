@@ -139,25 +139,35 @@ export default function ProductForm({ initialData }: ProductFormProps) {
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Attributes</label>
         {attributesList.map((attr, index) => (
-          <div key={index} className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mb-2">
-            <input
-              type="text"
-              placeholder="Attribute Key (e.g., Artist)"
-              value={attr.key}
-              onChange={(e) => handleAttributeChange(index, 'key', e.target.value)}
-              className="flex-1 border border-gray-300 rounded-md shadow-sm p-2 text-sm"
-            />
-            <input
-              type="text"
-              placeholder="Attribute Value (e.g., John Doe)"
-              value={attr.value}
-              onChange={(e) => handleAttributeChange(index, 'value', e.target.value)}
-              className="flex-1 border border-gray-300 rounded-md shadow-sm p-2 text-sm"
-            />
+          <div key={index} className="bg-gray-50 p-3 rounded-md mb-4">
+            <div className="flex flex-col sm:flex-row sm:space-x-2 mb-2">
+              <div className="w-full sm:w-1/3">
+                <label htmlFor={`attribute-key-${index}`} className="block text-xs font-medium text-gray-500">Key</label>
+                <input
+                  type="text"
+                  id={`attribute-key-${index}`}
+                  placeholder="Attribute Key (e.g., Artist)"
+                  value={attr.key}
+                  onChange={(e) => handleAttributeChange(index, 'key', e.target.value)}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-sm"
+                />
+              </div>
+              <div className="w-full sm:w-2/3 mt-2 sm:mt-0">
+                <label htmlFor={`attribute-value-${index}`} className="block text-xs font-medium text-gray-500">Value</label>
+                <input
+                  type="text"
+                  id={`attribute-value-${index}`}
+                  placeholder="Attribute Value (e.g., John Doe)"
+                  value={attr.value}
+                  onChange={(e) => handleAttributeChange(index, 'value', e.target.value)}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-sm"
+                />
+              </div>
+            </div>
             <button
               type="button"
               onClick={() => handleRemoveAttribute(index)}
-              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
+              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm mt-2"
             >
               Remove
             </button>
@@ -176,9 +186,14 @@ export default function ProductForm({ initialData }: ProductFormProps) {
         <label className="block text-sm font-medium text-gray-700">Images</label>
         <ImageUpload initialCloudinaryPublicIds={formData.cloudinaryPublicIds} onImageUpload={handleCloudinaryPublicIdsChange} />
       </div>
-      <button type="submit" disabled={loading} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50">
-        {loading ? 'Saving...' : (initialData ? 'Update Product' : 'Create Product')}
-      </button>
+      <div className="flex space-x-2">
+        <button type="submit" disabled={loading} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50">
+          {loading ? 'Saving...' : (initialData ? 'Update Product' : 'Create Product')}
+        </button>
+        <button type="button" onClick={() => router.push('/admin/products')} className="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400">
+          Cancel
+        </button>
+      </div>
     </form>
   );
 }

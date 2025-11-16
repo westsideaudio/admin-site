@@ -16,9 +16,6 @@ export default function AdminSidebar() {
       </div>
       <nav className="flex-grow flex justify-center">
         <ul className="flex space-x-3">
-          <li>
-            <Link href="/admin/products" className="hover:text-gray-300 text-sm">Products</Link>
-          </li>
           {/* Add more admin links here */}
         </ul>
       </nav>

@@ -37,25 +37,43 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
   try {
     const body = await request.json();
-    const { name, description, category, price, stock, cloudinaryPublicIds, attributes } = body;
+    const { name, description, category, price, stock, cloudinaryPublicIds, attributes, featured } = body;
     const errors: string[] = [];
+    const updateFields: Record<string, any> = {};
 
-    if (!name) errors.push("name is required");
-    if (!description) errors.push("description is required");
-    if (!category) errors.push("category is required");
-    if (price === undefined) errors.push("price is required");
-    if (stock === undefined) errors.push("stock is required");
-    if (!cloudinaryPublicIds) errors.push("cloudinaryPublicIds are required");
-    if (!attributes) errors.push("attributes are required");
-
-    if (cloudinaryPublicIds && (!Array.isArray(cloudinaryPublicIds) || cloudinaryPublicIds.some(id => typeof id !== 'string'))) {
-      errors.push("cloudinaryPublicIds must be an array of strings");
+    if (name !== undefined) {
+      if (typeof name !== 'string' || name.trim() === '') errors.push("name must be a non-empty string");
+      updateFields.name = name;
     }
-    if (price !== undefined && typeof price !== 'number') {
-      errors.push("price must be a number");
+    if (description !== undefined) {
+      if (typeof description !== 'string' || description.trim() === '') errors.push("description must be a non-empty string");
+      updateFields.description = description;
     }
-    if (stock !== undefined && typeof stock !== 'number') {
-      errors.push("stock must be a number");
+    if (category !== undefined) {
+      if (typeof category !== 'string' || category.trim() === '') errors.push("category must be a non-empty string");
+      updateFields.category = category;
+    }
+    if (price !== undefined) {
+      if (typeof price !== 'number' || isNaN(price)) errors.push("price must be a number");
+      updateFields.price = price;
+    }
+    if (stock !== undefined) {
+      if (typeof stock !== 'number' || isNaN(stock)) errors.push("stock must be a number");
+      updateFields.stock = stock;
+    }
+    if (cloudinaryPublicIds !== undefined) {
+      if (!Array.isArray(cloudinaryPublicIds) || cloudinaryPublicIds.some(id => typeof id !== 'string')) {
+        errors.push("cloudinaryPublicIds must be an array of strings");
+      }
+      updateFields.cloudinaryPublicIds = cloudinaryPublicIds;
+    }
+    if (attributes !== undefined) {
+      if (typeof attributes !== 'object' || attributes === null) errors.push("attributes must be an object");
+      updateFields.attributes = attributes;
+    }
+    if (featured !== undefined) {
+      if (typeof featured !== 'boolean') errors.push("featured must be a boolean");
+      updateFields.featured = featured;
     }
 
     if (errors.length > 0) {
@@ -67,21 +85,23 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
       return NextResponse.json({ message: "Product not found" }, { status: 404 });
     }
 
-    // Identify images to delete from Cloudinary
-    const oldPublicIds = existingProduct.cloudinaryPublicIds || [];
-    const publicIdsToDelete = oldPublicIds.filter((publicId: string) => !cloudinaryPublicIds.includes(publicId));
+    // Handle Cloudinary image deletion if cloudinaryPublicIds are provided in the update
+    if (updateFields.cloudinaryPublicIds) {
+      const oldPublicIds = existingProduct.cloudinaryPublicIds || [];
+      const publicIdsToDelete = oldPublicIds.filter((publicId: string) => !updateFields.cloudinaryPublicIds.includes(publicId));
 
-    if (publicIdsToDelete.length > 0) {
-      await Promise.all(publicIdsToDelete.map((publicId: string) => cloudinary.uploader.destroy(publicId)));
+      if (publicIdsToDelete.length > 0) {
+        await Promise.all(publicIdsToDelete.map((publicId: string) => cloudinary.uploader.destroy(publicId)));
+      }
     }
 
     // If category changed, regenerate SKU
     let newSku = existingProduct.sku;
-    if (existingProduct.category !== category) {
+    if (updateFields.category && existingProduct.category !== updateFields.category) {
       let prefix = '';
-      if (category === 'vinyl-cd') {
+      if (updateFields.category === 'vinyl-cd') {
         prefix = 'VC';
-      } else if (category === 'audio-equipment') {
+      } else if (updateFields.category === 'audio-equipment') {
         prefix = 'AE';
       } else {
         return NextResponse.json({ message: "Invalid category for SKU generation" }, { status: 400 });
@@ -99,9 +119,10 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
           isUnique = true;
         }
       }
+      updateFields.sku = newSku;
     }
 
-    const updatedProduct = await Product.findByIdAndUpdate(id, { ...body, sku: newSku, cloudinaryPublicIds }, { new: true, runValidators: true });
+    const updatedProduct = await Product.findByIdAndUpdate(id, { ...updateFields }, { new: true, runValidators: true });
     return NextResponse.json(updatedProduct, { status: 200 });
 
   } catch (error: any) {
