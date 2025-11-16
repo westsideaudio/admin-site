@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
-export default function AuthErrorPage() {
+function AuthErrorPageContent() {
   const searchParams = useSearchParams();
   const error = searchParams.get('error');
 
@@ -17,5 +18,13 @@ export default function AuthErrorPage() {
         Are you lost?
       </Link>
     </div>
+  );
+}
+
+export default function AuthErrorPage() {
+  return (
+    <Suspense>
+      <AuthErrorPageContent />
+    </Suspense>
   );
 }
