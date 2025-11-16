@@ -11,9 +11,9 @@ cloudinary.config({
 });
 
 
-export async function GET(request: NextRequest, context: { params: { id: string } }) {
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   await dbConnect();
-  const { id } = context.params;
+  const { id } = await context.params;
 
   try {
     console.log('Backend: Received product ID for GET:', id);
