@@ -139,25 +139,25 @@ export default function ProductForm({ initialData }: ProductFormProps) {
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Attributes</label>
         {attributesList.map((attr, index) => (
-          <div key={index} className="flex space-x-2 mb-2">
+          <div key={index} className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mb-2">
             <input
               type="text"
               placeholder="Attribute Key (e.g., Artist)"
               value={attr.key}
               onChange={(e) => handleAttributeChange(index, 'key', e.target.value)}
-              className="flex-1 border border-gray-300 rounded-md shadow-sm p-2"
+              className="flex-1 border border-gray-300 rounded-md shadow-sm p-2 text-sm"
             />
             <input
               type="text"
               placeholder="Attribute Value (e.g., John Doe)"
               value={attr.value}
               onChange={(e) => handleAttributeChange(index, 'value', e.target.value)}
-              className="flex-1 border border-gray-300 rounded-md shadow-sm p-2"
+              className="flex-1 border border-gray-300 rounded-md shadow-sm p-2 text-sm"
             />
             <button
               type="button"
               onClick={() => handleRemoveAttribute(index)}
-              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
             >
               Remove
             </button>

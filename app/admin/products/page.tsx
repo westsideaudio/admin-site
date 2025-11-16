@@ -14,9 +14,9 @@ export default async function AdminProductsPage() {
   const products = await getProducts();
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold">Product Management</h1>
-      <div className="mt-4 mb-8 w-full">
+    <div className="flex flex-col">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Product Management</h1>
         <Link href="/admin/products/new" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
           Add New Product
         </Link>
