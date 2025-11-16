@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { Product } from '@/models/product';
 import { useRouter } from 'next/navigation';
 
+const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'your_cloud_name'}/image/upload/`;
+
 interface ProductListProps {
   products: Product[];
 }
@@ -44,8 +46,8 @@ export default function ProductList({ products }: ProductListProps) {
             <tr key={product._id}>
               <td className="py-2 px-4">{product.name}</td>
               <td className="py-2 px-4">
-                {product.imageUrls && product.imageUrls.length > 0 && (
-                  <Image src={product.imageUrls[0]} alt={product.name} width={50} height={50} style={{ objectFit: "cover" }} />
+                {product.cloudinaryPublicIds && product.cloudinaryPublicIds.length > 0 && (
+                  <Image src={`${CLOUDINARY_BASE_URL}${product.cloudinaryPublicIds[0]}`} alt={product.name} width={50} height={50} style={{ objectFit: "cover" }} />
                 )}
               </td>
               <td className="py-2 px-4">{product.category}</td>

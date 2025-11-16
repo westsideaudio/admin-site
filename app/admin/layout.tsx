@@ -1,8 +1,14 @@
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/auth';
+import { redirect } from 'next/navigation';
 import AdminSidebar from './components/AdminSidebar';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  // Authentication/Authorization checks are deferred for now as per user's instruction.
-  // In a real application, you would check for a valid session here.
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.email || !(process.env.ALLOWED_ADMIN_EMAILS?.split(',').includes(session.user.email))) {
+    redirect('/login');
+  }
 
   return (
     <div className="flex min-h-screen">

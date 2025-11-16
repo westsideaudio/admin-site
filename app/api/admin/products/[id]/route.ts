@@ -37,7 +37,7 @@ export async function PUT(request: NextRequest, context: { params: { id: string 
 
   try {
     const body = await request.json();
-    const { name, description, category, price, stock, imageUrls, attributes } = body;
+    const { name, description, category, price, stock, cloudinaryPublicIds, attributes } = body;
     const errors: string[] = [];
 
     if (!name) errors.push("name is required");
@@ -45,11 +45,11 @@ export async function PUT(request: NextRequest, context: { params: { id: string 
     if (!category) errors.push("category is required");
     if (price === undefined) errors.push("price is required");
     if (stock === undefined) errors.push("stock is required");
-    if (!imageUrls) errors.push("imageUrls are required");
+    if (!cloudinaryPublicIds) errors.push("cloudinaryPublicIds are required");
     if (!attributes) errors.push("attributes are required");
 
-    if (imageUrls && (!Array.isArray(imageUrls) || imageUrls.some(url => typeof url !== 'string'))) {
-      errors.push("imageUrls must be an array of strings");
+    if (cloudinaryPublicIds && (!Array.isArray(cloudinaryPublicIds) || cloudinaryPublicIds.some(id => typeof id !== 'string'))) {
+      errors.push("cloudinaryPublicIds must be an array of strings");
     }
     if (price !== undefined && typeof price !== 'number') {
       errors.push("price must be a number");
@@ -69,16 +69,7 @@ export async function PUT(request: NextRequest, context: { params: { id: string 
 
     // Identify images to delete from Cloudinary
     const oldPublicIds = existingProduct.cloudinaryPublicIds || [];
-    const newPublicIds = imageUrls.map((url: string) => {
-      const parts = url.split('/');
-      const folderIndex = parts.indexOf('westsideaudio-products');
-      if (folderIndex > -1) {
-        return `${parts.slice(folderIndex).join('/').split('.')[0]}`;
-      }
-      return parts[parts.length - 1].split('.')[0];
-    });
-
-    const publicIdsToDelete = oldPublicIds.filter((publicId: string) => !newPublicIds.includes(publicId));
+    const publicIdsToDelete = oldPublicIds.filter((publicId: string) => !cloudinaryPublicIds.includes(publicId));
 
     if (publicIdsToDelete.length > 0) {
       await Promise.all(publicIdsToDelete.map((publicId: string) => cloudinary.uploader.destroy(publicId)));
@@ -110,7 +101,7 @@ export async function PUT(request: NextRequest, context: { params: { id: string 
       }
     }
 
-    const updatedProduct = await Product.findByIdAndUpdate(id, { ...body, sku: newSku, cloudinaryPublicIds: newPublicIds }, { new: true, runValidators: true });
+    const updatedProduct = await Product.findByIdAndUpdate(id, { ...body, sku: newSku, cloudinaryPublicIds }, { new: true, runValidators: true });
     return NextResponse.json(updatedProduct, { status: 200 });
 
   } catch (error: any) {

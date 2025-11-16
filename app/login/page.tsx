@@ -10,7 +10,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (status === 'authenticated') {
-      router.push('/admin');
+      router.push('/admin/products');
     }
   }, [session, status, router]);
 
@@ -20,8 +20,12 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <button onClick={() => signIn('google')}>
-        Sign In to Admin Panel
+      <button
+        onClick={() => signIn('google')}
+        className="flex items-center gap-2 rounded-lg bg-white p-4 text-black shadow-md transition-all hover:scale-105 hover:shadow-lg dark:bg-zinc-800 dark:text-white"
+      >
+        <img src="/google.svg" alt="Google logo" className="h-6 w-6" />
+        Login with Google
       </button>
     </div>
   );

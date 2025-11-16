@@ -6,7 +6,6 @@ export interface Product {
   sku: string;
   price: number;
   stock: number;
-  imageUrls: string[];
   cloudinaryPublicIds: string[];
   attributes: Object;
   featured: boolean;

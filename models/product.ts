@@ -8,7 +8,6 @@ export interface Product extends Document {
   sku: string;
   price: number;
   stock: number;
-  imageUrls: string[];
   cloudinaryPublicIds: string[]; // Store Cloudinary public IDs
   attributes: Object; // This will store Artist, Genre, Condition, etc.
   featured: boolean;
@@ -22,8 +21,7 @@ const ProductSchema: Schema = new Schema(
     sku: { type: String, required: true, unique: true },
     price: { type: Number, required: true },
     stock: { type: Number, required: true, default: 0 },
-    imageUrls: { type: [String], required: true },
-    cloudinaryPublicIds: { type: [String], required: true, default: [] }, // Store Cloudinary public IDs
+    cloudinaryPublicIds: { type: [String], required: true }, // Store Cloudinary public IDs
     attributes: { type: Object, required: true }, // Store attributes as a generic object
     featured: { type: Boolean, required: true, default: false },
   },

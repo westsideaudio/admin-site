@@ -3,23 +3,25 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 
 interface ImageUploadProps {
-  onImageUpload: (urls: string[]) => void;
-  initialImageUrls?: string[];
+  onImageUpload: (publicIds: string[]) => void;
+  initialCloudinaryPublicIds?: string[];
 }
 
-export default function ImageUpload({ onImageUpload, initialImageUrls = [] }: ImageUploadProps) {
+const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'your_cloud_name'}/image/upload/`;
+
+export default function ImageUpload({ onImageUpload, initialCloudinaryPublicIds = [] }: ImageUploadProps) {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>(initialImageUrls);
+  const [uploadedPublicIds, setUploadedPublicIds] = useState<string[]>(initialCloudinaryPublicIds);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setUploadedImageUrls(initialImageUrls);
-  }, [initialImageUrls]);
+    setUploadedPublicIds(initialCloudinaryPublicIds);
+  }, [initialCloudinaryPublicIds]);
 
   useEffect(() => {
-    onImageUpload(uploadedImageUrls);
-  }, [uploadedImageUrls, onImageUpload]);
+    onImageUpload(uploadedPublicIds);
+  }, [uploadedPublicIds, onImageUpload]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -35,7 +37,7 @@ export default function ImageUpload({ onImageUpload, initialImageUrls = [] }: Im
 
     setUploading(true);
     setError(null);
-    const newUrls: string[] = [];
+    const newPublicIds: string[] = [];
 
     for (const file of selectedFiles) {
       const formData = new FormData();
@@ -51,7 +53,7 @@ export default function ImageUpload({ onImageUpload, initialImageUrls = [] }: Im
 
         if (res.ok) {
           const data = await res.json();
-          newUrls.push(data.secure_url);
+          newPublicIds.push(data.public_id);
         } else {
           const errorData = await res.json();
           setError(`Failed to upload ${file.name}: ${errorData.error.message}`);
@@ -63,13 +65,13 @@ export default function ImageUpload({ onImageUpload, initialImageUrls = [] }: Im
       }
     }
 
-    setUploadedImageUrls((prev) => [...prev, ...newUrls]);
+    setUploadedPublicIds((prev) => [...prev, ...newPublicIds]);
     setSelectedFiles([]);
     setUploading(false);
   };
 
-  const handleRemoveImage = (urlToRemove: string) => {
-    setUploadedImageUrls((prev) => prev.filter((url) => url !== urlToRemove));
+  const handleRemoveImage = (publicIdToRemove: string) => {
+    setUploadedPublicIds((prev) => prev.filter((publicId) => publicId !== publicIdToRemove));
     // TODO: Optionally call Cloudinary API to delete the image from storage
   };
 
@@ -92,14 +94,14 @@ export default function ImageUpload({ onImageUpload, initialImageUrls = [] }: Im
         </div>
       )}
 
-      {uploadedImageUrls.length > 0 && (
+      {uploadedPublicIds.length > 0 && (
         <div className="mt-4">
           <h3 className="font-semibold">Current Images:</h3>
           <div className="flex flex-wrap gap-2 mt-2">
-            {uploadedImageUrls.map((url, index) => (
+            {uploadedPublicIds.map((publicId, index) => (
               <div key={index} className="relative w-24 h-24 border rounded overflow-hidden">
-                <Image src={url} alt={`Product Image ${index + 1}`} fill style={{ objectFit: "cover" }} />
-                <button type="button" onClick={() => handleRemoveImage(url)} className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">
+                <Image src={`${CLOUDINARY_BASE_URL}${publicId}`} alt={`Product Image ${index + 1}`} fill style={{ objectFit: "cover" }} />
+                <button type="button" onClick={() => handleRemoveImage(publicId)} className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">
                   X
                 </button>
               </div>

@@ -20,7 +20,7 @@ export const authOptions = {
         return true;
       } else {
         // Redirect to an error page or deny access
-        return '/auth/error?error=UnauthorizedAdmin';
+        return '/auth/error';
       }
     },
     async redirect({ url, baseUrl }: { url: string, baseUrl: string }) {

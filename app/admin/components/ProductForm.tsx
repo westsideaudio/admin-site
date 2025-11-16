@@ -17,7 +17,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
     sku: '', // SKU will be auto-generated
     price: 0,
     stock: 0,
-    imageUrls: [],
+    cloudinaryPublicIds: [],
     attributes: {},
     ...initialData,
   });
@@ -67,8 +67,8 @@ export default function ProductForm({ initialData }: ProductFormProps) {
     setAttributesList((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleImageUrlsChange = useCallback((urls: string[]) => {
-    setFormData((prev) => ({ ...prev, imageUrls: urls }));
+  const handleCloudinaryPublicIdsChange = useCallback((publicIds: string[]) => {
+    setFormData((prev) => ({ ...prev, cloudinaryPublicIds: publicIds }));
   }, []); // No dependencies, as setFormData is stable
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -174,7 +174,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
 
       <div>
         <label className="block text-sm font-medium text-gray-700">Images</label>
-        <ImageUpload initialImageUrls={formData.imageUrls} onImageUpload={handleImageUrlsChange} />
+        <ImageUpload initialCloudinaryPublicIds={formData.cloudinaryPublicIds} onImageUpload={handleCloudinaryPublicIdsChange} />
       </div>
       <button type="submit" disabled={loading} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50">
         {loading ? 'Saving...' : (initialData ? 'Update Product' : 'Create Product')}

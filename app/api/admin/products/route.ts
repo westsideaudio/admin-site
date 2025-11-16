@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     // Basic validation
-    const { name, description, category, price, stock, imageUrls, attributes } = body;
+    const { name, description, category, price, stock, cloudinaryPublicIds, attributes } = body;
     const errors: string[] = [];
 
     if (!name) errors.push("name is required");
@@ -25,11 +25,11 @@ export async function POST(request: NextRequest) {
     if (!category) errors.push("category is required");
     if (price === undefined) errors.push("price is required");
     if (stock === undefined) errors.push("stock is required");
-    if (!imageUrls) errors.push("imageUrls are required");
+    if (!cloudinaryPublicIds) errors.push("cloudinaryPublicIds are required");
     if (!attributes) errors.push("attributes are required");
 
-    if (imageUrls && (!Array.isArray(imageUrls) || imageUrls.some(url => typeof url !== 'string'))) {
-      errors.push("imageUrls must be an array of strings");
+    if (cloudinaryPublicIds && (!Array.isArray(cloudinaryPublicIds) || cloudinaryPublicIds.some(id => typeof id !== 'string'))) {
+      errors.push("cloudinaryPublicIds must be an array of strings");
     }
     if (price !== undefined && typeof price !== 'number') {
       errors.push("price must be a number");
@@ -64,15 +64,6 @@ export async function POST(request: NextRequest) {
         isUnique = true;
       }
     }
-
-    const cloudinaryPublicIds = imageUrls.map((url: string) => {
-      const parts = url.split('/');
-      const folderIndex = parts.indexOf('westsideaudio-products');
-      if (folderIndex > -1) {
-        return `${parts.slice(folderIndex).join('/').split('.')[0]}`;
-      }
-      return parts[parts.length - 1].split('.')[0];
-    });
 
     const newProduct = await Product.create({ ...body, sku, cloudinaryPublicIds });
     return NextResponse.json(newProduct, { status: 201 });
