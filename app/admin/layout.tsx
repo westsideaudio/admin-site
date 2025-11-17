@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 import { redirect } from 'next/navigation';
 import AdminSidebar from './components/AdminSidebar';
+import {ToastNotification} from './components/ToastNotification'; // Import ToastNotification as a default export
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -16,6 +17,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <main className="flex-1 p-6">
         {children}
       </main>
+      <ToastNotification /> {/* Add ToastNotification here */}
     </div>
   );
 }

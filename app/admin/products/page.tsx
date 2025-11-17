@@ -1,5 +1,7 @@
+import { Suspense } from 'react';
 import Link from 'next/link';
 import ProductList from '../components/ProductList';
+import ProductListSkeleton from '../components/ProductListSkeleton'; // Import the skeleton loader
 import { Product } from '@/models/product';
 
 async function getProducts(): Promise<Product[]> {
@@ -21,7 +23,9 @@ export default async function AdminProductsPage() {
           Add New Product
         </Link>
       </div>
-      <ProductList products={products} />
+      <Suspense fallback={<ProductListSkeleton />}>
+        <ProductList products={products} />
+      </Suspense>
     </div>
   );
 }
