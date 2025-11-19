@@ -14,19 +14,20 @@ export default function AdminSidebar() {
   };
 
   return (
-    <header className="bg-gray-800 text-white py-2 px-4 flex justify-between items-center relative">
-      <div className="flex items-center space-x-2">
+    <header className="bg-gray-800 text-white py-2 px-4 flex items-center relative">
+      <div className="flex items-center space-x-2 flex-shrink-0">
+        {/* Hamburger menu for mobile */}
+        <div className="md:hidden">
+          <HamburgerIcon onClick={toggleMobileMenu} />
+        </div>
         <h2 className="text-xl font-bold">Admin Panel</h2>
         {session && (
           <p className="text-sm hidden md:block">Hello, <span className="font-semibold">{session.user?.email}</span></p>
         )}
       </div>
 
-      {/* Hamburger menu for mobile */}
-      <HamburgerIcon onClick={toggleMobileMenu} />
-
       {/* Desktop Navigation */}
-      <nav className="hidden md:flex flex-grow justify-center">
+      <nav className="hidden md:flex ml-auto mr-auto">
         <ul className="flex space-x-3">
           <li>
             <Link href="/admin" className="hover:text-gray-300">Dashboard</Link>
@@ -64,7 +65,7 @@ export default function AdminSidebar() {
       )}
 
       {session && (
-        <div className="hidden md:flex items-center space-x-2">
+        <div className="hidden md:flex items-center space-x-2 ml-auto flex-shrink-0">
           <button
             onClick={() => signOut()}
             className="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-sm"

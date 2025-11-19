@@ -105,6 +105,7 @@ export default function ProductList({ products }: ProductListProps) {
             <th className="py-2 px-4 text-left">Product</th>
             <th className="py-2 px-4 text-left hidden md:table-cell">Category</th>
             <th className="py-2 px-4 text-left hidden md:table-cell w-24">Price</th>
+            <th className="py-2 px-4 text-left hidden md:table-cell w-24">Stock</th>
             <th className="py-2 px-4 text-right md:text-left">Actions</th>
           </tr>
         </thead>
@@ -141,16 +142,19 @@ export default function ProductList({ products }: ProductListProps) {
               </td>
               <td className="py-2 px-4 hidden md:table-cell text-base">{product.category}</td>
               <td className="py-2 px-4 hidden md:table-cell text-base">${product.price.toFixed(2)}</td>
-              <td className="py-2 px-4 hidden md:table-cell justify-start items-center space-x-2"> {/* Actions for desktop */}
-                <button onClick={() => toggleFeatured(product._id, product.featured)} className="p-2 text-#e3b419-500 rounded-md">
-                  <Image src={product.featured ? "/star-filled.svg" : "/star-outline.svg"} alt="Toggle Featured" width={24} height={24} />
-                </button>
-                <Link href={`/admin/products/${product._id}/edit`} className="p-2 text-blue-500 rounded-md">
-                  <Image src="/edit.svg" alt="Edit" width={24} height={24} />
-                </Link>
-                <button onClick={() => handleDelete(product._id)} className="p-2 text-red-500 rounded-md">
-                  <Image src="/delete.svg" alt="Delete" width={24} height={24}/>
-                </button>
+              <td className="py-2 px-4 hidden md:table-cell text-base">{product.stock}</td>
+              <td className="py-2 px-4 hidden md:table-cell"> {/* Actions for desktop */}
+                <div className="flex justify-start items-center space-x-2">
+                  <button onClick={() => toggleFeatured(product._id, product.featured)} className="p-2 text-#e3b419-500 rounded-md">
+                    <Image src={product.featured ? "/star-filled.svg" : "/star-outline.svg"} alt="Toggle Featured" width={24} height={24} />
+                  </button>
+                  <Link href={`/admin/products/${product._id}/edit`} className="p-2 text-blue-500 rounded-md">
+                    <Image src="/edit.svg" alt="Edit" width={24} height={24} />
+                  </Link>
+                  <button onClick={() => handleDelete(product._id)} className="p-2 text-red-500 rounded-md">
+                    <Image src="/delete.svg" alt="Delete" width={24} height={24}/>
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

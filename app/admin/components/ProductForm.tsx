@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import ImageUpload from './ImageUpload';
 import { Product } from '@/models/product';
 import { toast } from './ToastNotification'; // Import toast
+import { categories } from '@/app/data/categories';
 
 interface ProductFormProps {
   initialData?: Product;
@@ -38,6 +39,18 @@ export default function ProductForm({ initialData }: ProductFormProps) {
     }, {} as Record<string, string>);
     setFormData((prev) => ({ ...prev, attributes: newAttributes }));
   }, [attributesList]); // Dependency on attributesList
+
+  useEffect(() => {
+    if (!initialData) {
+      const selectedCategory = categories.find(cat => cat.slug === formData.category);
+      if (selectedCategory && selectedCategory.defaultAttributes) {
+        const defaultAttrs = selectedCategory.defaultAttributes.map(key => ({ key, value: '' }));
+        setAttributesList(defaultAttrs);
+      } else {
+        setAttributesList([]);
+      }
+    }
+  }, [formData.category, initialData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
