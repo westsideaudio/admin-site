@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Product } from '@/models/product';
 import { useRouter } from 'next/navigation';
-import { toast } from './ToastNotification'; // Import toast
+import { toast } from './ToastNotification';
 
 const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'your_cloud_name'}/image/upload/`;
 
@@ -70,96 +70,159 @@ export default function ProductList({ products }: ProductListProps) {
   });
 
   return (
-    <div className="overflow-x-auto w-full">
-      <div className="flex flex-col md:flex-row justify-between items-center mb-4 space-y-2 md:space-y-0 md:space-x-4">
-        <div className="w-full md:w-auto">
-          <label htmlFor="categoryFilter" className="sr-only">Filter by Category</label>
+    <div className="w-full">
+      {/* Filters */}
+      <div className="p-4 border-b border-border flex flex-col md:flex-row justify-between items-center gap-4 bg-card rounded-t-lg">
+        <div className="w-full md:w-auto flex flex-col sm:flex-row gap-2 items-center">
           <select
             id="categoryFilter"
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
-            className="block w-full p-2 border border-gray-300 rounded-md shadow-sm text-base"
+            className="block w-full md:w-48 p-2 border border-input rounded-md shadow-sm text-sm bg-background text-foreground focus:ring-primary focus:border-primary"
           >
             <option value="all">All Categories</option>
             <option value="vinyl-cd">Vinyl/CDs</option>
             <option value="audio-equipment">Audio Equipment</option>
           </select>
-        </div>
-        <div className="w-full md:w-auto">
-          <label htmlFor="sortOrder" className="sr-only">Sort by</label>
           <select
             id="sortOrder"
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
-            className="block w-full p-2 border border-gray-300 rounded-md shadow-sm text-base"
+            className="block w-full md:w-48 p-2 border border-input rounded-md shadow-sm text-sm bg-background text-foreground focus:ring-primary focus:border-primary"
           >
-            <option value="none">No Sort</option>
+            <option value="none">Sort by...</option>
             <option value="price-asc">Price: Low to High</option>
             <option value="price-desc">Price: High to Low</option>
           </select>
         </div>
+        <div className="text-sm text-muted-foreground">
+          Showing {sortedProducts.length} products
+        </div>
       </div>
-      <table className="min-w-full bg-white border border-gray-200">
-        <thead className="hidden md:table-header-group">
-          <tr>
-            <th className="py-2 px-4 text-left">Product</th>
-            <th className="py-2 px-4 text-left hidden md:table-cell">Category</th>
-            <th className="py-2 px-4 text-left hidden md:table-cell w-24">Price</th>
-            <th className="py-2 px-4 text-left hidden md:table-cell w-24">Stock</th>
-            <th className="py-2 px-4 text-right md:text-left">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedProducts.map((product) => (
-            <tr key={product._id} className="flex flex-col md:table-row border-b border-gray-200 mb-4 md:mb-0 p-2 md:p-0">
-              <td className="py-2 px-4 flex items-center justify-between md:table-cell">
-                <div className="flex items-center space-x-2">
-                  {product.cloudinaryPublicIds && product.cloudinaryPublicIds.length > 0 && (
+
+      {/* Desktop Table */}
+      <div className="hidden md:block overflow-x-auto">
+        <table className="w-full text-sm text-left">
+          <thead className="text-xs text-muted-foreground uppercase bg-muted/50">
+            <tr>
+              <th className="py-3 px-4 font-medium">Product</th>
+              <th className="py-3 px-4 font-medium">Category</th>
+              <th className="py-3 px-4 font-medium">Price</th>
+              <th className="py-3 px-4 font-medium">Stock</th>
+              <th className="py-3 px-4 font-medium text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {sortedProducts.map((product) => (
+              <tr key={product._id} className="hover:bg-muted/50 transition-colors">
+                <td className="py-3 px-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="relative w-10 h-10 rounded-md overflow-hidden bg-muted flex-shrink-0">
+                      {product.cloudinaryPublicIds && product.cloudinaryPublicIds.length > 0 ? (
+                        <Image
+                          src={`${CLOUDINARY_BASE_URL}${product.cloudinaryPublicIds[0]}`}
+                          alt={product.name}
+                          fill
+                          sizes="40px"
+                          className="object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">No Img</div>
+                      )}
+                    </div>
+                    <span className="font-medium text-foreground">{product.name}</span>
+                  </div>
+                </td>
+                <td className="py-3 px-4 text-muted-foreground">{product.category}</td>
+                <td className="py-3 px-4 font-medium">${product.price.toFixed(2)}</td>
+                <td className="py-3 px-4 text-muted-foreground">{product.stock}</td>
+                <td className="py-3 px-4 text-right">
+                  <div className="flex justify-end items-center space-x-2">
+                    <button
+                      onClick={() => toggleFeatured(product._id, product.featured)}
+                      className={`p-2 rounded-md transition-colors ${product.featured ? 'text-yellow-500 bg-yellow-500/10' : 'text-muted-foreground hover:bg-muted'}`}
+                      title="Toggle Featured"
+                    >
+                      <Image src={product.featured ? "/star-filled.svg" : "/star-outline.svg"} alt="Toggle Featured" width={18} height={18} />
+                    </button>
+                    <Link href={`/admin/products/${product._id}/edit`} className="p-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors" title="Edit">
+                      <Image src="/edit.svg" alt="Edit" width={18} height={18} />
+                    </Link>
+                    <button onClick={() => handleDelete(product._id)} className="p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors" title="Delete">
+                      <Image src="/delete.svg" alt="Delete" width={18} height={18} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {sortedProducts.length === 0 && (
+              <tr>
+                <td colSpan={5} className="py-8 text-center text-muted-foreground">
+                  No products found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile Cards */}
+      <div className="md:hidden p-4 space-y-4 bg-muted/10">
+        {sortedProducts.map((product) => (
+          <div key={product._id} className="bg-card border border-border rounded-lg shadow-sm p-4 flex flex-col gap-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="relative w-16 h-16 rounded-md overflow-hidden bg-muted flex-shrink-0 border border-border">
+                  {product.cloudinaryPublicIds && product.cloudinaryPublicIds.length > 0 ? (
                     <Image
                       src={`${CLOUDINARY_BASE_URL}${product.cloudinaryPublicIds[0]}`}
                       alt={product.name}
-                      width={50}
-                      height={50}
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      style={{ objectFit: "cover" }}
-                      className="rounded-md"
+                      fill
+                      sizes="64px"
+                      className="object-cover"
                       loading="lazy"
                     />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">No Img</div>
                   )}
-                  <span className="font-medium text-lg text-gray-800">{product.name}</span>
                 </div>
-                <div className="flex items-center space-x-2 md:hidden"> {/* Actions for mobile */}
-                  <button onClick={() => toggleFeatured(product._id, product.featured)} className="p-2 text-#e3b419-500 rounded-md">
-                    <Image src={product.featured ? "/star-filled.svg" : "/star-outline.svg"} alt="Toggle Featured" width={24} height={24} />
-                  </button>
-                  <Link href={`/admin/products/${product._id}/edit`} className="p-2 text-blue-500 rounded-md">
-                    <Image src="/edit.svg" alt="Edit" width={24} height={24} />
-                  </Link>
-                  <button onClick={() => handleDelete(product._id)} className="p-2 text-red-500 rounded-md">
-                    <Image src="/delete.svg" alt="Delete" width={24} height={24}/>
-                  </button>
+                <div>
+                  <h3 className="font-semibold text-foreground line-clamp-2">{product.name}</h3>
+                  <p className="text-sm text-muted-foreground">{product.category}</p>
                 </div>
-              </td>
-              <td className="py-2 px-4 hidden md:table-cell text-base">{product.category}</td>
-              <td className="py-2 px-4 hidden md:table-cell text-base">${product.price.toFixed(2)}</td>
-              <td className="py-2 px-4 hidden md:table-cell text-base">{product.stock}</td>
-              <td className="py-2 px-4 hidden md:table-cell"> {/* Actions for desktop */}
-                <div className="flex justify-start items-center space-x-2">
-                  <button onClick={() => toggleFeatured(product._id, product.featured)} className="p-2 text-#e3b419-500 rounded-md">
-                    <Image src={product.featured ? "/star-filled.svg" : "/star-outline.svg"} alt="Toggle Featured" width={24} height={24} />
-                  </button>
-                  <Link href={`/admin/products/${product._id}/edit`} className="p-2 text-blue-500 rounded-md">
-                    <Image src="/edit.svg" alt="Edit" width={24} height={24} />
-                  </Link>
-                  <button onClick={() => handleDelete(product._id)} className="p-2 text-red-500 rounded-md">
-                    <Image src="/delete.svg" alt="Delete" width={24} height={24}/>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </div>
+              <div className="text-right">
+                <p className="font-bold text-lg">${product.price.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground">{product.stock} in stock</p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-3 border-t border-border mt-1">
+              <button
+                onClick={() => toggleFeatured(product._id, product.featured)}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${product.featured ? 'bg-yellow-500/10 text-yellow-600' : 'bg-muted text-muted-foreground'}`}
+              >
+                <Image src={product.featured ? "/star-filled.svg" : "/star-outline.svg"} alt="" width={16} height={16} />
+                {product.featured ? 'Featured' : 'Feature'}
+              </button>
+              <div className="flex items-center gap-2">
+                <Link href={`/admin/products/${product._id}/edit`} className="p-2 bg-blue-50 text-blue-600 rounded-md border border-blue-100">
+                  <Image src="/edit.svg" alt="Edit" width={18} height={18} />
+                </Link>
+                <button onClick={() => handleDelete(product._id)} className="p-2 bg-red-50 text-red-600 rounded-md border border-red-100">
+                  <Image src="/delete.svg" alt="Delete" width={18} height={18} />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+        {sortedProducts.length === 0 && (
+          <div className="text-center py-8 text-muted-foreground">
+            No products found.
+          </div>
+        )}
+      </div>
     </div>
   );
 }

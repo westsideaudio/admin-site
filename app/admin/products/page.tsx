@@ -1,30 +1,37 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import ProductList from '../components/ProductList';
-import ProductListSkeleton from '../components/ProductListSkeleton'; // Import the skeleton loader
+import ProductListSkeleton from '../components/ProductListSkeleton';
 import { Product } from '@/models/product';
+import dbConnect from '@/lib/dbConnect';
+import ProductModel from '@/models/product';
 
 async function getProducts(): Promise<Product[]> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/products`, { cache: 'no-store' });
-  if (!res.ok) {
-    throw new Error('Failed to fetch products');
-  }
-  return res.json();
+  await dbConnect();
+  // Use lean() for performance and to return POJOs. Sort by newest first.
+  const products = await ProductModel.find({}).sort({ createdAt: -1 }).lean();
+  // Serialize _id and other non-serializable fields
+  return JSON.parse(JSON.stringify(products));
 }
 
 export default async function AdminProductsPage() {
   const products = await getProducts();
 
   return (
-    <div className="flex flex-col">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Product Management</h1>
-        <Link href="/admin/products/new" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+    <div className="flex flex-col space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Product Management</h1>
+          <p className="text-muted-foreground mt-1">Manage your inventory, prices, and featured items.</p>
+        </div>
+        <Link href="/admin/products/new" className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors font-medium shadow-sm">
           Add New Product
         </Link>
       </div>
       <Suspense fallback={<ProductListSkeleton />}>
-        <ProductList products={products} />
+        <div className="bg-card rounded-lg border border-border shadow-sm">
+          <ProductList products={products} />
+        </div>
       </Suspense>
     </div>
   );
