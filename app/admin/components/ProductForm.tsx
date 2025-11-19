@@ -90,6 +90,14 @@ export default function ProductForm({ initialData }: ProductFormProps) {
     setLoading(true);
     setError(null);
 
+    // Validate that at least one image is uploaded
+    if (!formData.cloudinaryPublicIds || formData.cloudinaryPublicIds.length === 0) {
+      setError('Please upload at least one product image.');
+      toast.error('Please upload at least one product image.');
+      setLoading(false);
+      return;
+    }
+
     const method = initialData ? 'PUT' : 'POST';
     const url = initialData ? `/api/admin/products/${initialData._id}` : '/api/admin/products';
 
@@ -120,19 +128,19 @@ export default function ProductForm({ initialData }: ProductFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {error && <div className="text-red-500">{error}</div>}
-      <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
-        <input type="text" id="name" name="name" value={formData.name || ''} onChange={handleChange} required className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 text-base" />
+    <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
+      {error && <div className="text-red-600 bg-red-50 border border-red-200 rounded-md p-4 text-sm">{error}</div>}
+      <div className="space-y-1">
+        <label htmlFor="name" className="block text-sm font-medium text-foreground">Name</label>
+        <input type="text" id="name" name="name" value={formData.name || ''} onChange={handleChange} required className="mt-1 block w-full border border-input rounded-md shadow-sm p-3 md:p-2.5 text-base bg-background text-foreground focus:ring-primary focus:border-primary" />
       </div>
-      <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
-        <textarea id="description" name="description" value={formData.description || ''} onChange={handleChange} required rows={4} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 text-base"></textarea>
+      <div className="space-y-1">
+        <label htmlFor="description" className="block text-sm font-medium text-foreground">Description</label>
+        <textarea id="description" name="description" value={formData.description || ''} onChange={handleChange} required rows={4} className="mt-1 block w-full border border-input rounded-md shadow-sm p-3 md:p-2.5 text-base bg-background text-foreground focus:ring-primary focus:border-primary"></textarea>
       </div>
-      <div>
-        <label htmlFor="category" className="block text-sm font-medium text-gray-700">Category</label>
-        <select id="category" name="category" value={formData.category || 'vinyl-cd'} onChange={handleCategoryChange} required className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 text-base">
+      <div className="space-y-1">
+        <label htmlFor="category" className="block text-sm font-medium text-foreground">Category</label>
+        <select id="category" name="category" value={formData.category || 'vinyl-cd'} onChange={handleCategoryChange} required className="mt-1 block w-full border border-input rounded-md shadow-sm p-3 md:p-2.5 text-base bg-background text-foreground focus:ring-primary focus:border-primary h-12 md:h-auto">
           <option value="vinyl-cd">Vinyl/CDs</option>
           <option value="audio-equipment">Audio Equipment</option>
         </select>
@@ -140,50 +148,52 @@ export default function ProductForm({ initialData }: ProductFormProps) {
       {/* SKU will be auto-generated and displayed, not input directly */}
       {formData.sku && (
         <div>
-          <label className="block text-sm font-medium text-gray-700">SKU</label>
-          <p className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100">{formData.sku}</p>
+          <label className="block text-sm font-medium text-foreground mb-1">SKU</label>
+          <p className="mt-1 block w-full border border-input rounded-md shadow-sm p-2 bg-muted text-muted-foreground">{formData.sku}</p>
         </div>
       )}
-      <div>
-        <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price</label>
-        <input type="number" id="price" name="price" value={formData.price || 0} onChange={handleNumberChange} required step="0.01" className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 text-base" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-1">
+          <label htmlFor="price" className="block text-sm font-medium text-foreground">Price</label>
+          <input type="number" id="price" name="price" value={formData.price || 0} onChange={handleNumberChange} required step="0.01" className="mt-1 block w-full border border-input rounded-md shadow-sm p-3 md:p-2.5 text-base bg-background text-foreground focus:ring-primary focus:border-primary" />
+        </div>
+        <div className="space-y-1">
+          <label htmlFor="stock" className="block text-sm font-medium text-foreground">Stock</label>
+          <input type="number" id="stock" name="stock" value={formData.stock || 0} onChange={handleNumberChange} required className="mt-1 block w-full border border-input rounded-md shadow-sm p-3 md:p-2.5 text-base bg-background text-foreground focus:ring-primary focus:border-primary" />
+        </div>
       </div>
-      <div>
-        <label htmlFor="stock" className="block text-sm font-medium text-gray-700">Stock</label>
-        <input type="number" id="stock" name="stock" value={formData.stock || 0} onChange={handleNumberChange} required className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 text-base" />
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Attributes</label>
+      <div className="space-y-3">
+        <label className="block text-sm font-medium text-foreground">Attributes</label>
         {attributesList.map((attr, index) => (
-          <div key={index} className="bg-gray-50 p-3 rounded-md mb-4">
+          <div key={index} className="bg-muted/50 border border-border p-4 rounded-md mb-3">
             <div className="flex flex-col sm:flex-row sm:space-x-2 mb-2">
               <div className="w-full sm:w-1/3">
-                <label htmlFor={`attribute-key-${index}`} className="block text-xs font-medium text-gray-500">Key</label>
+                <label htmlFor={`attribute-key-${index}`} className="block text-xs font-medium text-muted-foreground mb-1">Key</label>
                 <input
                   type="text"
                   id={`attribute-key-${index}`}
                   placeholder="Attribute Key (e.g., Artist)"
                   value={attr.key}
                   onChange={(e) => handleAttributeChange(index, 'key', e.target.value)}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 text-base"
+                  className="mt-1 block w-full border border-input rounded-md shadow-sm p-3 text-base bg-background text-foreground focus:ring-primary focus:border-primary"
                 />
               </div>
               <div className="w-full sm:w-2/3 mt-2 sm:mt-0">
-                <label htmlFor={`attribute-value-${index}`} className="block text-xs font-medium text-gray-500">Value</label>
+                <label htmlFor={`attribute-value-${index}`} className="block text-xs font-medium text-muted-foreground mb-1">Value</label>
                 <input
                   type="text"
                   id={`attribute-value-${index}`}
                   placeholder="Attribute Value (e.g., John Doe)"
                   value={attr.value}
                   onChange={(e) => handleAttributeChange(index, 'value', e.target.value)}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 text-base"
+                  className="mt-1 block w-full border border-input rounded-md shadow-sm p-3 text-base bg-background text-foreground focus:ring-primary focus:border-primary"
                 />
               </div>
             </div>
             <button
               type="button"
               onClick={() => handleRemoveAttribute(index)}
-              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 text-base mt-2"
+              className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 text-sm mt-2 transition-colors"
             >
               Remove
             </button>
@@ -192,22 +202,22 @@ export default function ProductForm({ initialData }: ProductFormProps) {
         <button
           type="button"
           onClick={handleAddAttribute}
-          className="bg-blue-500 text-white px-5 py-3 rounded hover:bg-blue-600 mt-2 text-base"
+          className="w-full md:w-auto bg-primary text-primary-foreground px-5 py-3 rounded-md hover:bg-primary/90 text-sm font-medium transition-colors flex items-center justify-center"
         >
-          Add Attribute
+          + Add Attribute
         </button>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Images</label>
+        <label className="block text-sm font-medium text-foreground mb-2">Images <span className="text-red-600">*</span></label>
         <ImageUpload initialCloudinaryPublicIds={formData.cloudinaryPublicIds} onImageUpload={handleCloudinaryPublicIdsChange} />
       </div>
-      <div className="flex space-x-2">
-        <button type="submit" disabled={loading} className="bg-green-500 text-white px-5 py-3 rounded hover:bg-green-600 disabled:opacity-50 text-base">
-          {loading ? 'Saving...' : (initialData ? 'Update Product' : 'Create Product')}
-        </button>
-        <button type="button" onClick={() => router.push('/admin/products')} className="bg-gray-300 text-gray-800 px-5 py-3 rounded hover:bg-gray-400 text-base">
+      <div className="flex flex-col-reverse sm:flex-row gap-3 pt-6 border-t border-border">
+        <button type="button" onClick={() => router.push('/admin/products')} className="w-full sm:w-auto bg-secondary text-secondary-foreground px-6 py-3.5 rounded-md hover:bg-secondary/80 text-base font-medium transition-colors text-center">
           Cancel
+        </button>
+        <button type="submit" disabled={loading} className="w-full sm:w-auto bg-accent text-white px-8 py-3.5 rounded-md hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed text-base font-medium transition-colors shadow-sm text-center">
+          {loading ? 'Saving...' : (initialData ? 'Update Product' : 'Create Product')}
         </button>
       </div>
     </form>

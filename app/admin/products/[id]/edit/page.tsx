@@ -6,7 +6,6 @@ async function getProduct(id: string): Promise<Product> {
   const res = await fetch(apiUrl, { cache: 'no-store' });
   if (!res.ok) {
     const errorData = await res.json();
-    console.error('API Error:', errorData);
     throw new Error(errorData.message || 'Failed to fetch product');
   }
   return res.json();
@@ -14,7 +13,6 @@ async function getProduct(id: string): Promise<Product> {
 
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> | { id: string } }) {
   const { id } = await params;
-  console.log('Product ID received:', id); // Log the ID
   const product = await getProduct(id);
 
   return (

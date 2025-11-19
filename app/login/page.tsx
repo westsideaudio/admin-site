@@ -15,18 +15,43 @@ export default function LoginPage() {
   }, [session, status, router]);
 
   if (status === 'loading') {
-    return <p>Loading...</p>;
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+          <p className="text-sm text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <button
-        onClick={() => signIn('google')}
-        className="flex items-center gap-2 rounded-lg bg-white p-4 text-black shadow-md transition-all hover:scale-105 hover:shadow-lg dark:bg-zinc-800 dark:text-white"
-      >
-        <img src="/google.svg" alt="Google logo" className="h-6 w-6" />
-        Login with Google
-      </button>
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+      <div className="w-full max-w-md">
+        <div className="bg-card border border-border rounded-lg shadow-lg p-8">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-foreground mb-2">Westside Audio</h1>
+            <p className="text-muted-foreground">Admin Portal</p>
+          </div>
+
+          {/* Login Button */}
+          <button
+            onClick={() => signIn('google')}
+            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 rounded-lg px-6 py-3 transition-all hover:shadow-md font-medium"
+          >
+            <img src="/google.svg" alt="Google" className="h-5 w-5" />
+            Sign in with Google
+          </button>
+
+          {/* Footer */}
+          <footer className="mt-8 pt-6 border-t border-border">
+            <p className="text-center text-xs text-muted-foreground">
+              © {new Date().getFullYear()} Westside Audio. All rights reserved.
+            </p>
+          </footer>
+        </div>
+      </div>
     </div>
   );
 }

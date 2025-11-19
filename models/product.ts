@@ -11,6 +11,8 @@ export interface Product extends Document {
   cloudinaryPublicIds: string[]; // Store Cloudinary public IDs
   attributes: Object; // This will store Artist, Genre, Condition, etc.
   featured: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 const ProductSchema: Schema = new Schema(

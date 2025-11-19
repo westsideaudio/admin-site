@@ -16,9 +16,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
   const { id } = await context.params;
 
   try {
-    console.log('Backend: Received product ID for GET:', id);
     const product = await Product.findById(id);
-    console.log('Backend: Product found by ID:', product);
     if (!product) {
       return NextResponse.json({ message: "Product not found" }, { status: 404 });
     }

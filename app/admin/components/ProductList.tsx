@@ -109,6 +109,7 @@ export default function ProductList({ products }: ProductListProps) {
               <th className="py-3 px-4 font-medium">Category</th>
               <th className="py-3 px-4 font-medium">Price</th>
               <th className="py-3 px-4 font-medium">Stock</th>
+              <th className="py-3 px-4 font-medium">Date</th>
               <th className="py-3 px-4 font-medium text-right">Actions</th>
             </tr>
           </thead>
@@ -137,6 +138,12 @@ export default function ProductList({ products }: ProductListProps) {
                 <td className="py-3 px-4 text-muted-foreground">{product.category}</td>
                 <td className="py-3 px-4 font-medium">${product.price.toFixed(2)}</td>
                 <td className="py-3 px-4 text-muted-foreground">{product.stock}</td>
+                <td className="py-3 px-4 text-xs text-muted-foreground">
+                  <div>Created: {product.createdAt ? new Date(product.createdAt).toLocaleDateString() : 'N/A'}</div>
+                  {product.updatedAt && product.updatedAt !== product.createdAt && (
+                    <div className="text-[10px] opacity-75">Upd: {new Date(product.updatedAt).toLocaleDateString()}</div>
+                  )}
+                </td>
                 <td className="py-3 px-4 text-right">
                   <div className="flex justify-end items-center space-x-2">
                     <button
@@ -195,6 +202,9 @@ export default function ProductList({ products }: ProductListProps) {
               <div className="text-right">
                 <p className="font-bold text-lg">${product.price.toFixed(2)}</p>
                 <p className="text-xs text-muted-foreground">{product.stock} in stock</p>
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  {product.createdAt ? new Date(product.createdAt).toLocaleDateString() : ''}
+                </p>
               </div>
             </div>
 
