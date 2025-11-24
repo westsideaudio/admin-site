@@ -6,7 +6,7 @@ import { Product } from '@/models/product';
 import { useRouter } from 'next/navigation';
 import { toast } from './ToastNotification';
 
-const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'your_cloud_name'}/image/upload/`;
+const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'your_cloud_name'}/image/upload/f_jpg/`;
 
 interface ProductListProps {
   products: Product[];

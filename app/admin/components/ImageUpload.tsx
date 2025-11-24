@@ -7,7 +7,7 @@ interface ImageUploadProps {
   initialCloudinaryPublicIds?: string[];
 }
 
-const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'your_cloud_name'}/image/upload/`;
+const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'your_cloud_name'}/image/upload/f_jpg/`;
 
 export default function ImageUpload({ onImageUpload, initialCloudinaryPublicIds = [] }: ImageUploadProps) {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -49,6 +49,7 @@ export default function ImageUpload({ onImageUpload, initialCloudinaryPublicIds 
       formData.append('file', file);
       formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'your_unsigned_upload_preset');
       formData.append('cloud_name', process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'your_cloud_name');
+      formData.append('format', 'jpg');
 
       try {
         const res = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'your_cloud_name'}/image/upload`, {
