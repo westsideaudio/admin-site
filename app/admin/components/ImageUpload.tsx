@@ -45,13 +45,35 @@ export default function ImageUpload({ onImageUpload, initialCloudinaryPublicIds 
     let completedFiles = 0;
 
     for (const file of selectedFiles) {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'your_unsigned_upload_preset');
-      formData.append('cloud_name', process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'your_cloud_name');
-      formData.append('format', 'jpg');
-
       try {
+        const timestamp = Math.round((new Date()).getTime() / 1000);
+        const paramsToSign = {
+          timestamp: timestamp,
+          format: 'jpg',
+        };
+
+        const signatureRes = await fetch('/api/admin/cloudinary-sign', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ paramsToSign }),
+        });
+
+        if (!signatureRes.ok) {
+          throw new Error('Failed to get upload signature');
+        }
+
+        const { signature, apiKey } = await signatureRes.json();
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('api_key', apiKey);
+        formData.append('timestamp', timestamp.toString());
+        formData.append('signature', signature);
+        formData.append('format', 'jpg');
+        // formData.append('cloud_name', process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'your_cloud_name'); // Not strictly needed for signed upload URL but good for reference if needed
+
         const res = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'your_cloud_name'}/image/upload`, {
           method: 'POST',
           body: formData,
